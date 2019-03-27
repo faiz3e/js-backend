@@ -1,0 +1,7 @@
+mongose
+passport
+passport-jwt
+jsonwebtoken 
+body-parser
+bcryptjs 
+validator
