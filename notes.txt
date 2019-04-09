@@ -5,3 +5,8 @@ jsonwebtoken
 body-parser
 bcryptjs 
 validator
+
+
+Error codes
+200 Success
+400 Bad Request
