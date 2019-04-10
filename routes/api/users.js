@@ -4,10 +4,12 @@ const gravatar = require('gravatar');
 const bcryptjs = require('bcryptjs');
 var jwt = require('jsonwebtoken');
 var keys = require('../../config/keys');
-
 //load user model 
-
 const User = require('../../models/Users')
+var passport = require('passport');
+const validateRegisterInput = require('../../validation/register')
+
+
 //@route    GET  api/users/test
 //@desc     test users route 
 //@access   Public
@@ -19,6 +21,14 @@ router.get('/test', (request, response) => {
 //@desc     register users route 
 //@access   Public
 router.post('/register', (request, response) => {
+  // const { error, isValid } = validateRegisterInput(request.body)
+
+  const { error, isValid } = validateRegisterInput({name:'bdd'})
+  console.log(error,isValid);
+  
+  if (!isValid) {
+    return response.status(400).json(error)// 400 Bad Request
+  }
   User.findOne({ email: request.body.email })       //? findOne  method returns the first occurrence in the selection.
     .then(user => {
       if (user) {
@@ -74,8 +84,6 @@ router.post('/register', (request, response) => {
 //     })
 // })
 
-
-
 //@route    GET  api/users/login
 //@desc     login users route return token  
 //@access   Public
@@ -100,9 +108,10 @@ router.post('/login', (request, response) => {
                 success: true,
                 token: 'Bearer ' + token
               })
-            });
-          // response.json({ msg: 'success' })
-        } else {
+            }
+          );
+        }
+        else {
           return response.status(400).json({ error: 'password incorrect' })
         }
       })
@@ -110,4 +119,19 @@ router.post('/login', (request, response) => {
 })
 
 
+
+//@route    GET  api/users/current
+//@desc     login users route return current user
+//@access   Private
+router.get('/current', passport.authenticate('jwt', { session: false }), (request, response) => {
+  response.json({
+    id: request.user.id,
+    name: request.user.name,
+    email: request.user.email
+  })
+})
+
+
+
 module.exports = router;
+
